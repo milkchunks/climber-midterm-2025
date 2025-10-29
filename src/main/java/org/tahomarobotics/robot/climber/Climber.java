@@ -1,6 +1,4 @@
-package org.tahomarobotics.climber;
-
-import org.littletonrobotics.junction.Logger;
+package org.tahomarobotics.robot.climber;
 
 public class Climber implements AutoCloseable {
     private final ClimberSubsystem climber;
