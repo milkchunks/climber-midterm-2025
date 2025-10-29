@@ -1,4 +1,4 @@
-package org.tahomarobotics;
+package org.tahomarobotics.robot;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

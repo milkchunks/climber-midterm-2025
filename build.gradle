@@ -78,6 +78,9 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api"
     testImplementation "org.junit.jupiter:junit-jupiter-params"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+
+    implementation "org.tinylog:tinylog-api:2.7.0"
+    implementation "org.tinylog:tinylog-impl:2.7.0"
 }
 
 test{
