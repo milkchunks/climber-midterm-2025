@@ -3,9 +3,11 @@ package org.tahomarobotics.robot.climber;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.DeviceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.tahomarobotics.robot.RobotMap;
@@ -18,7 +20,7 @@ class ClimberSubsystem extends AbstractSubsystem {
     final TalonFX rollerMotor;
     final TalonFX leftPivotMotor;
     final TalonFX rightPivotMotor;
-    final PWMVictorSPX solenoid;
+    final Solenoid solenoid;
 
     final MotionMagicVoltage pivotPositionController = new MotionMagicVoltage(0);
     final MotionMagicVelocityVoltage rollerVelocityController = new MotionMagicVelocityVoltage(0);
@@ -79,6 +81,15 @@ class ClimberSubsystem extends AbstractSubsystem {
         leftPivotMotor.stopMotor();
         rightPivotMotor.stopMotor();
         org.littletonrobotics.junction.Logger.recordOutput("Climber/Pivot Target Voltage", 0);
+    }
+
+    //i guess...
+    void engageSolenoid() {
+        solenoid.set(true);
+    }
+
+    void disengageSolenoid() {
+        solenoid.set(false);
     }
 
     @Override
