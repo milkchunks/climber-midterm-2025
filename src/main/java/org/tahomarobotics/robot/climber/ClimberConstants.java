@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import org.tahomarobotics.robot.RobotMap;
 
 import static edu.wpi.first.units.Units.*;
@@ -25,7 +26,7 @@ class ClimberConstants {
     static final double DEPLOY_POSITION = 90.0;
     static final double ZERO_POSITION = 0.0;
 
-    static final double ZERO_VOLTAGE = 1.0;
+    static final Voltage ZERO_VOLTAGE = Volts.of(1.0);
     static final double STOPPED_TOLERANCE = 0.01;
     static final int ZEROING_TIMEOUT = 5;
     static final int CLIMB_TIMEOUT = 10;

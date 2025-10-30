@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -49,6 +50,8 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     Angle pivotTargetPosition = pivotState.theta;
     @AutoLogOutput(key = "Climber/Is Solenoid Engaged?")
     boolean isSolenoidEngaged = true;
+    @AutoLogOutput(key = "Climber/Using Zero Pivot Voltage?")
+    boolean usingZeroPivotVoltage = false;
 
 
 
@@ -70,8 +73,8 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         RobustConfigurator.tryConfigureTalonFX("Climber Left Pivot Motor", leftPivotMotor, ClimberConstants.leftMotorConfiguration);
         RobustConfigurator.tryConfigureTalonFX("Climber Right Pivot Motor", rightPivotMotor, ClimberConstants.rightMotorConfiguration);
 
-        BaseStatusSignal.setUpdateFrequencyForAll(50, signals[0].signal(), signals[1].signal()); //more important
-        BaseStatusSignal.setUpdateFrequencyForAll(10, signals[2].signal()); //less important
+        BaseStatusSignal.setUpdateFrequencyForAll(50, signals[0].signal(), signals[1].signal()); //more important, 50 updates per second
+        BaseStatusSignal.setUpdateFrequencyForAll(10, signals[2].signal()); //less important, 10 updates per second
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, leftPivotMotor, rightPivotMotor);
     }
 
@@ -88,9 +91,11 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     }
 
     void setZeroingVoltage() {
+        usingZeroPivotVoltage = true;
         pivotState = PivotState.ZEROED;
-        leftPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
-        rightPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
+        leftPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE.baseUnitMagnitude());
+        rightPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE.baseUnitMagnitude());
+        usingZeroPivotVoltage = false;
     }
 
     void stopRoller() {
@@ -107,11 +112,13 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         Logger.info("Climber zeroing.");
 
         //set the internal measure of position to the zeroed angle.
+        Logger.info("Setting pivot state to ZEROED");
         leftPivotMotor.setPosition(PivotState.ZEROED.theta);
         rightPivotMotor.setPosition(PivotState.ZEROED.theta);
         pivotState = PivotState.ZEROED;
 
         //Stow
+        Logger.info("Transitioning to stowed.");
         transitionToStowed();
     }
 

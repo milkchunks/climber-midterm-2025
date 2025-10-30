@@ -10,10 +10,9 @@ public class ClimberCommands {
     public static Command createZeroCommand(ClimberSubsystem climberSubsystem) {
         return climberSubsystem
                 .runOnce(climberSubsystem::disengageSolenoid)
-                .andThen(climberSubsystem.run(climberSubsystem::setZeroingVoltage)
-                        .until(climberSubsystem::pivotIsStopped)
-                        .withTimeout(ClimberConstants.ZEROING_TIMEOUT))
-                .andThen(climberSubsystem::zero);
+                .andThen(climberSubsystem.runOnce(climberSubsystem::setZeroingVoltage))
+                .andThen(Commands.waitUntil(climberSubsystem::pivotIsStopped).withTimeout(ClimberConstants.ZEROING_TIMEOUT))
+                .finallyDo(climberSubsystem::zero);
     }
 
     public static Command createClimbCommand(ClimberSubsystem climberSubsystem) {
@@ -22,8 +21,8 @@ public class ClimberCommands {
         }
         return climberSubsystem.runOnce(climberSubsystem::transitionToDeployed)
                 .andThen(climberSubsystem.runOnce(climberSubsystem::beginIntakingCage))
-                .andThen(Commands.waitUntil(climberSubsystem::isLimitSwitchHit))
-                .andThen(climberSubsystem.runOnce(climberSubsystem::transitionToHoldingCage).withTimeout(ClimberConstants.CLIMB_TIMEOUT))
+                .andThen(Commands.waitUntil(climberSubsystem::isLimitSwitchHit).withTimeout(ClimberConstants.CLIMB_TIMEOUT))
+                .andThen(climberSubsystem.runOnce(climberSubsystem::transitionToHoldingCage))
                 .andThen(climberSubsystem::transitionToStowed)
                 .andThen(climberSubsystem::transitionToClimbed);
     }
