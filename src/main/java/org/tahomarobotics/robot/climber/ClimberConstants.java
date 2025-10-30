@@ -10,16 +10,16 @@ import org.tahomarobotics.robot.RobotMap;
 import static edu.wpi.first.units.Units.*;
 
 class ClimberConstants {
-    private static final double ROLLER_GEAR_RATIO = (34.0 / 8.0) * (18.0 / 18.0);
-    private static final double PIVOT_GEAR_RATIO = (72.0 / 8.0) * (72.0 / 20.0) * (9.0 / 72.0) * (36.0 / 9.0);
+     static final double ROLLER_GEAR_RATIO = (34.0 / 8.0) * (18.0 / 18.0);
+     static final double PIVOT_GEAR_RATIO = (72.0 / 8.0) * (72.0 / 20.0) * (9.0 / 72.0) * (36.0 / 9.0);
 
     static final AngularVelocity MAX_ROLLER_VELOCITY = RotationsPerSecond.of(5.0);
     //wow this is the worst thing ever
     //reach max velocity in 1/4 of a second at the fastest (tentative)
-    private static final AngularAcceleration MAX_ROLLER_ACCELERATION = RotationsPerSecondPerSecond.of(MAX_ROLLER_VELOCITY.times(RotationsPerSecond.of(4.0)).magnitude());
+    static final AngularAcceleration MAX_ROLLER_ACCELERATION = RotationsPerSecondPerSecond.of(MAX_ROLLER_VELOCITY.times(RotationsPerSecond.of(4.0)).magnitude());
 
-    private static final AngularVelocity MAX_PIVOT_VELOCITY = RotationsPerSecond.of(2.0);
-    private static final AngularAcceleration MAX_PIVOT_ACCELERATION = RotationsPerSecondPerSecond.of(MAX_PIVOT_VELOCITY.times(RotationsPerSecond.of(4.0)).magnitude());
+    static final AngularVelocity MAX_PIVOT_VELOCITY = RotationsPerSecond.of(2.0);
+    static final AngularAcceleration MAX_PIVOT_ACCELERATION = RotationsPerSecondPerSecond.of(MAX_PIVOT_VELOCITY.times(RotationsPerSecond.of(4.0)).magnitude());
 
     static final double STOW_POSITION = 10.0;
     static final double DEPLOY_POSITION = 90.0;
@@ -28,6 +28,9 @@ class ClimberConstants {
     static final double ZERO_VOLTAGE = 1.0;
     static final double STOPPED_TOLERANCE = 0.01;
     static final int ZEROING_TIMEOUT = 5;
+
+    static final double CLIMBER_LENGTH = 0.3410458; //meters
+    static final double CLIMBER_MASS = 2.429; //kg
 
     static final TalonFXConfiguration climberMotorConfiguration = new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs()

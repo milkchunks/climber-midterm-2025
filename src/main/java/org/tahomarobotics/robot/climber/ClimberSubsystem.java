@@ -1,11 +1,13 @@
 package org.tahomarobotics.robot.climber;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -179,5 +181,18 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         HOLDING_CAGE,
         INTAKING_CAGE,
         CLIMBED;
+    }
+
+    //Getters/setters
+    double getLeftVoltageAsDouble() {
+        return leftPivotMotor.getMotorVoltage().getValueAsDouble();
+    }
+
+    double getRightVoltageAsDouble() {
+        return rightPivotMotor.getMotorVoltage().getValueAsDouble();
+    }
+
+    double getRollerVoltageAsDouble() {
+        return rollerMotor.getMotorVoltage().getValueAsDouble();
     }
 }
