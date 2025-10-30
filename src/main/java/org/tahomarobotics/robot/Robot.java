@@ -9,19 +9,27 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.tahomarobotics.robot.climber.Climber;
+import org.tahomarobotics.robot.util.AbstractSubsystem;
 
 
-
-public class Robot extends TimedRobot
+public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
     
     private final OI oi;
+    private final Climber climber = new Climber();
+    AutoCloseable[] subsystems = new AutoCloseable[] {climber};
     
     
     public Robot()
     {
         oi = new OI();
+        AutoLogOutputManager.addObject(climber);
+        Logger.start();
     }
     
     
