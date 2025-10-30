@@ -8,11 +8,12 @@ import java.util.function.BooleanSupplier;
 
 public class ClimberCommands {
     public static Command createZeroCommand(ClimberSubsystem climberSubsystem) {
+        //todo: somewhere in here the commandscheduler loop gets overrun
         return climberSubsystem
                 .runOnce(climberSubsystem::disengageSolenoid)
                 .andThen(climberSubsystem.runOnce(climberSubsystem::setZeroingVoltage))
-                .andThen(Commands.waitUntil(climberSubsystem::pivotIsStopped).withTimeout(ClimberConstants.ZEROING_TIMEOUT))
-                .finallyDo(climberSubsystem::zero);
+                .andThen(Commands.waitUntil(climberSubsystem::pivotIsStopped)/*.withTimeout(ClimberConstants.ZEROING_TIMEOUT)*/)
+                .andThen(climberSubsystem::zero);
     }
 
     public static Command createClimbCommand(ClimberSubsystem climberSubsystem) {

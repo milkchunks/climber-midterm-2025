@@ -111,21 +111,19 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     void zero() {
         Logger.info("Climber zeroing.");
 
-        //set the internal measure of position to the zeroed angle.
-        Logger.info("Setting pivot state to ZEROED");
+        //set the motors' internal measure of position to the zeroed angle.
         leftPivotMotor.setPosition(PivotState.ZEROED.theta);
         rightPivotMotor.setPosition(PivotState.ZEROED.theta);
         pivotState = PivotState.ZEROED;
 
         //Stow
-        Logger.info("Transitioning to stowed.");
         transitionToStowed();
     }
 
     void engageSolenoid() {
         isSolenoidEngaged = true;
         //Continuously press on ratchet with 1% speed to hold it in place.
-        solenoid.set(VictorSPXControlMode.PercentOutput, ClimberConstants.SOLENOID_ENGAGED_PERCENT_SPEED);
+        solenoid.set(VictorSPXControlMode.PercentOutput, ClimberConstants.SOLENOID_ENGAGED_PERCENT_SPEED / 100.0);
     }
 
     void disengageSolenoid() {
