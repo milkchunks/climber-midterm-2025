@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import org.tinylog.Logger;
 
 public class Climber implements AutoCloseable {
-    private final ClimberSubsystem climber;
+    public final ClimberSubsystem climber;
     public Command zeroCommand;
     public Command climbCommand;
 

@@ -7,9 +7,12 @@ package org.tahomarobotics.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -17,22 +20,26 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.tahomarobotics.robot.climber.Climber;
 import org.tahomarobotics.robot.util.AbstractSubsystem;
+import org.tahomarobotics.robot.util.signals.LoggedStatusSignal;
 
 
 public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
     
-    private final OI oi;
     private final Climber climber = new Climber();
-    AutoCloseable[] subsystems = new AutoCloseable[] {climber};
-    
+
     
     public Robot()
     {
-        oi = new OI();
-        AutoLogOutputManager.addObject(climber);
         Logger.recordMetadata("Allison Bowe Midterm 2025", "ClimberBot");
+        if (isReal()) {
+            Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+        }
+        //No separate configs from sim because we do not want replay mode.
+        Logger.addDataReceiver(new NT4Publisher());
+
+        AutoLogOutputManager.addObject(climber);
         Logger.start();
     }
     
@@ -59,12 +66,6 @@ public class Robot extends LoggedRobot
     @Override
     public void autonomousInit()
     {
-        autonomousCommand = oi.getAutonomousCommand();
-        
-        if (autonomousCommand != null)
-        {
-            autonomousCommand.schedule();
-        }
     }
     
     
@@ -112,5 +113,11 @@ public class Robot extends LoggedRobot
     public static void main(String... args)
     {
         RobotBase.startRobot(Robot::new);
+    }
+
+    @Override
+    public void simulationInit() {
+        SmartDashboard.putData("Zero Climber", climber.zeroCommand);
+        SmartDashboard.putData("Climb", climber.climbCommand);
     }
 }
