@@ -2,12 +2,15 @@ package org.tahomarobotics.robot.climber;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -47,6 +50,8 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     Angle pivotTargetPosition = pivotState.theta;
     @AutoLogOutput(key = "Climber/Is Solenoid Engaged?")
     boolean isSolenoidEngaged = true;
+    @AutoLogOutput(key = "Climber/Using Zero Pivot Voltage?")
+    boolean usingZeroPivotVoltage = false;
 
 
 
@@ -67,6 +72,10 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         RobustConfigurator.tryConfigureTalonFX("Climber Roller Motor", rollerMotor, ClimberConstants.climberMotorConfiguration);
         RobustConfigurator.tryConfigureTalonFX("Climber Left Pivot Motor", leftPivotMotor, ClimberConstants.leftMotorConfiguration);
         RobustConfigurator.tryConfigureTalonFX("Climber Right Pivot Motor", rightPivotMotor, ClimberConstants.rightMotorConfiguration);
+
+        BaseStatusSignal.setUpdateFrequencyForAll(50, signals[0].signal(), signals[1].signal()); //more important, 50 updates per second
+        BaseStatusSignal.setUpdateFrequencyForAll(10, signals[2].signal()); //less important, 10 updates per second
+        ParentDevice.optimizeBusUtilizationForAll(rollerMotor, leftPivotMotor, rightPivotMotor);
     }
 
     void setRollerVelocity(AngularVelocity targetVelocity) {
@@ -82,9 +91,11 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     }
 
     void setZeroingVoltage() {
+        usingZeroPivotVoltage = true;
         pivotState = PivotState.ZEROED;
-        leftPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
-        rightPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
+        leftPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE.baseUnitMagnitude());
+        rightPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE.baseUnitMagnitude());
+        usingZeroPivotVoltage = false;
     }
 
     void stopRoller() {
@@ -100,7 +111,7 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     void zero() {
         Logger.info("Climber zeroing.");
 
-        //set the internal measure of position to the zeroed angle.
+        //set the motors' internal measure of position to the zeroed angle.
         leftPivotMotor.setPosition(PivotState.ZEROED.theta);
         rightPivotMotor.setPosition(PivotState.ZEROED.theta);
         pivotState = PivotState.ZEROED;
@@ -112,7 +123,7 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     void engageSolenoid() {
         isSolenoidEngaged = true;
         //Continuously press on ratchet with 1% speed to hold it in place.
-        solenoid.set(VictorSPXControlMode.PercentOutput, ClimberConstants.SOLENOID_ENGAGED_PERCENT_SPEED);
+        solenoid.set(VictorSPXControlMode.PercentOutput, ClimberConstants.SOLENOID_ENGAGED_PERCENT_SPEED / 100.0);
     }
 
     void disengageSolenoid() {
