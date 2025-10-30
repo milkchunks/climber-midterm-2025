@@ -6,10 +6,30 @@ import org.tahomarobotics.robot.util.RobustConfigurator;
 import org.tinylog.Logger;
 
 public class ClimberSubsystem {
-    TalonFX climberMotor;
+    TalonFX rollerMotor;
+
     ClimberSubsystem() {
         Logger.info("Instantiating Climber subsystem...");
-        climberMotor = new TalonFX(RobotMap.CLIMBER_MOTOR);
-        RobustConfigurator.tryConfigureTalonFX("Climber Motor", climberMotor, ClimberConstants.climberMotorConfiguration);
+        rollerMotor = new TalonFX(RobotMap.COLLECTOR_COLLECT_MOTOR);
+        RobustConfigurator.tryConfigureTalonFX("Climber Roller Motor", rollerMotor, ClimberConstants.climberMotorConfiguration);
+    }
+
+    enum PivotState {
+        STOWED(ClimberConstants.STOW_POSITION),
+        DEPLOYED(ClimberConstants.DEPLOY_POSITION),
+        ZEROED(ClimberConstants.STOW_POSITION);
+
+        final double position;
+
+        private PivotState(double position) {
+            this.position = position;
+        }
+    }
+
+    enum HoldState {
+        EMPTY,
+        HOLDING_CAGE,
+        INTAKING_CAGE,
+        EJECTING_CAGE;
     }
 }

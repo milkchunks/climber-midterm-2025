@@ -31,4 +31,7 @@ class ClimberConstants {
             .withMotionMagic(new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(MAX_VELOCITY)
                     .withMotionMagicAcceleration(MAX_ACCELERATION));
+
+    static final double STOW_POSITION = 0.0;
+    static final double DEPLOY_POSITION = 90.0;
 }
