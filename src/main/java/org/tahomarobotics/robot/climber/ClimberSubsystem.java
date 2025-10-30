@@ -75,7 +75,7 @@ class ClimberSubsystem extends AbstractSubsystem {
     }
 
     void stopPivot() {
-        Logger.info("Stopping climber pivot.")
+        Logger.info("Stopping climber pivot.");
         leftPivotMotor.stopMotor();
         rightPivotMotor.stopMotor();
         org.littletonrobotics.junction.Logger.recordOutput("Climber/Pivot Target Voltage", 0);
