@@ -82,6 +82,7 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     }
 
     void setZeroingVoltage() {
+        pivotState = PivotState.ZEROED;
         leftPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
         rightPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
     }
