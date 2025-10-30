@@ -26,6 +26,8 @@ class ClimberConstants {
 
     static final double ZERO_VOLTAGE = 1.0;
 
+    static final double SOLENOID_ENGAGEMENT_PERCENT_SPEED = 1.0;
+
     static final TalonFXConfiguration climberMotorConfiguration = new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs()
                     .withNeutralMode(NeutralModeValue.Brake)
