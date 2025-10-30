@@ -36,16 +36,22 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
 
     final LoggedStatusSignal[] signals;
 
+    //Tracker variables for logging
     @AutoLogOutput(key = "Climber/Pivot State")
     PivotState pivotState = PivotState.STOWED;
     @AutoLogOutput(key = "Climber/Hold State")
     HoldState holdState = HoldState.EMPTY;
+    @AutoLogOutput(key = "Climber/Roller Target Velocity")
+    AngularVelocity rollerTargetVelocity = AngularVelocity.ofBaseUnits(0.0, Units.DegreesPerSecond);
+    @AutoLogOutput(key = "Climber/Pivot Target Position")
+    Angle pivotTargetPosition = pivotState.theta;
+    @AutoLogOutput(key = "Climber/Is Solenoid Engaged?")
+    boolean isSolenoidEngaged = true;
 
 
 
 
     ClimberSubsystem() {
-        Logger.info("Instantiating Climber subsystem...");
         rollerMotor = new TalonFX(RobotMap.CLIMBER_ROLLER_MOTOR);
         leftPivotMotor = new TalonFX(RobotMap.CLIMBER_LEFT_MOTOR);
         rightPivotMotor = new TalonFX(RobotMap.CLIMBER_RIGHT_MOTOR);
@@ -53,8 +59,8 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         limitSwitch = new DigitalInput(RobotMap.CLIMBER_LIMIT_SWITCH);
 
         signals = new LoggedStatusSignal[] {
-                new LoggedStatusSignal("Pivot Position", leftPivotMotor.getPosition()),
-                new LoggedStatusSignal("Roller Velocity", rollerMotor.getVelocity()),
+                new LoggedStatusSignal("Pivot Actual Position", leftPivotMotor.getPosition()),
+                new LoggedStatusSignal("Roller Actual Velocity", rollerMotor.getVelocity()),
                 new LoggedStatusSignal("Pivot Voltage", leftPivotMotor.getMotorVoltage())
         };
 
@@ -64,34 +70,25 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     }
 
     void setRollerVelocity(AngularVelocity targetVelocity) {
+        rollerTargetVelocity = targetVelocity;
         rollerMotor.setControl(rollerVelocityController.withVelocity(targetVelocity));
-        org.littletonrobotics.junction.Logger.recordOutput("Climber/Roller Target Velocity", targetVelocity);
     }
 
     void setPivotPosition(Angle targetPosition) {
+        pivotTargetPosition = targetPosition;
         leftPivotMotor.setControl(pivotPositionController.withPosition(targetPosition));
         rightPivotMotor.setControl(pivotPositionController);
-        org.littletonrobotics.junction.Logger.recordOutput("Climber/Pivot Target Position", targetPosition);
 
     }
 
     void setZeroingVoltage() {
-        Logger.info("Setting pivot voltage to zeroing voltage...");
         leftPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
         rightPivotMotor.setVoltage(ClimberConstants.ZERO_VOLTAGE);
     }
 
     void stopRoller() {
-        Logger.info("Stopping climber roller.");
+        rollerTargetVelocity = AngularVelocity.ofBaseUnits(0.0, Units.DegreesPerSecond);
         rollerMotor.stopMotor();
-        org.littletonrobotics.junction.Logger.recordOutput("Climber/Roller Target Velocity", 0);
-    }
-
-    void stopPivot() {
-        Logger.info("Stopping climber pivot.");
-        leftPivotMotor.stopMotor();
-        rightPivotMotor.stopMotor();
-        org.littletonrobotics.junction.Logger.recordOutput("Climber/Pivot Target Voltage", 0);
     }
 
     boolean pivotIsStopped() {
@@ -100,7 +97,7 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
 
     //Set zero position of motors, then stow.
     void zero() {
-        Logger.info("Climber zeroed.");
+        Logger.info("Climber zeroing.");
 
         //set the internal measure of position to the zeroed angle.
         leftPivotMotor.setPosition(PivotState.ZEROED.theta);
@@ -112,18 +109,17 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     }
 
     void engageSolenoid() {
-        Logger.info("Engaged climber solenoid.");
+        isSolenoidEngaged = true;
         //Continuously press on ratchet with 1% speed to hold it in place.
         solenoid.set(VictorSPXControlMode.PercentOutput, ClimberConstants.SOLENOID_ENGAGED_PERCENT_SPEED);
     }
 
     void disengageSolenoid() {
-        Logger.info("Disengaged climber solenoid.");
+        isSolenoidEngaged = false;
         solenoid.set(VictorSPXControlMode.PercentOutput, 0);
     }
 
     void transitionToStowed() {
-        Logger.info("Stowing climber.");
         disengageSolenoid();
         pivotState = PivotState.STOWED;
         setPivotPosition(PivotState.STOWED.theta);
@@ -131,7 +127,6 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     }
 
     void transitionToDeployed() {
-        Logger.info("Deploying climber.");
         disengageSolenoid();
         pivotState = PivotState.DEPLOYED;
         setPivotPosition(PivotState.DEPLOYED.theta);
@@ -139,24 +134,23 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     }
 
     void transitionToHoldingCage() {
-        Logger.info("Holding cage.");
         holdState = HoldState.HOLDING_CAGE;
         stopRoller();
     }
 
     void transitionToClimbed() {
-        Logger.info("Climbed!");
+        Logger.info("Tried climbing!");
         holdState = HoldState.CLIMBED;
     }
 
     void beginIntakingCage() {
-        Logger.info("Intaking cage.");
         holdState = HoldState.INTAKING_CAGE;
         setRollerVelocity(ClimberConstants.MAX_ROLLER_VELOCITY);
     }
 
+    @AutoLogOutput(key = "Climber/Is Limit Switch Hit")
     boolean isLimitSwitchHit() {
-        return limitSwitch.get();
+        return !limitSwitch.get();
     }
 
     @Override
