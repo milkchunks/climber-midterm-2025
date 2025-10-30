@@ -7,6 +7,7 @@ import com.ctre.phoenix6.sim.DeviceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,7 +39,7 @@ class ClimberSubsystem extends AbstractSubsystem {
         rollerMotor = new TalonFX(RobotMap.CLIMBER_ROLLER_MOTOR);
         leftPivotMotor = new TalonFX(RobotMap.CLIMBER_LEFT_MOTOR);
         rightPivotMotor = new TalonFX(RobotMap.CLIMBER_RIGHT_MOTOR);
-        solenoid = new PWMVictorSPX(RobotMap.CLIMBER_SOLENOID);
+        solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.CLIMBER_SOLENOID);
 
         signals = new LoggedStatusSignal[] {
                 new LoggedStatusSignal("Pivot Position", leftPivotMotor.getPosition()),
