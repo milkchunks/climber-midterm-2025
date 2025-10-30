@@ -1,5 +1,7 @@
 package org.tahomarobotics.robot.climber;
 
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.tahomarobotics.robot.RobotMap;
 import org.tahomarobotics.robot.util.AbstractSubsystem;
 import org.tahomarobotics.robot.util.RobustConfigurator;
@@ -25,7 +28,7 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
     final TalonFX rollerMotor;
     final TalonFX leftPivotMotor;
     final TalonFX rightPivotMotor;
-    final Solenoid solenoid;
+    final VictorSPX solenoid;
     final DigitalInput limitSwitch;
 
     final MotionMagicVoltage pivotPositionController = new MotionMagicVoltage(0);
@@ -33,7 +36,9 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
 
     final LoggedStatusSignal[] signals;
 
+    @AutoLogOutput(key = "Climber/Pivot State")
     PivotState pivotState = PivotState.STOWED;
+    @AutoLogOutput(key = "Climber/Hold State")
     HoldState holdState = HoldState.EMPTY;
 
 
@@ -44,7 +49,7 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         rollerMotor = new TalonFX(RobotMap.CLIMBER_ROLLER_MOTOR);
         leftPivotMotor = new TalonFX(RobotMap.CLIMBER_LEFT_MOTOR);
         rightPivotMotor = new TalonFX(RobotMap.CLIMBER_RIGHT_MOTOR);
-        solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.CLIMBER_SOLENOID);
+        solenoid = new VictorSPX(RobotMap.CLIMBER_SOLENOID);
         limitSwitch = new DigitalInput(RobotMap.CLIMBER_LIMIT_SWITCH);
 
         signals = new LoggedStatusSignal[] {
@@ -106,15 +111,15 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         transitionToStowed();
     }
 
-    //i guess...
     void engageSolenoid() {
         Logger.info("Engaged climber solenoid.");
-        solenoid.set(true);
+        //Continuously press on ratchet with 1% speed to hold it in place.
+        solenoid.set(VictorSPXControlMode.PercentOutput, ClimberConstants.SOLENOID_ENGAGED_PERCENT_SPEED);
     }
 
     void disengageSolenoid() {
         Logger.info("Disengaged climber solenoid.");
-        solenoid.set(false);
+        solenoid.set(VictorSPXControlMode.PercentOutput, 0);
     }
 
     void transitionToStowed() {
@@ -139,6 +144,11 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         stopRoller();
     }
 
+    void transitionToClimbed() {
+        Logger.info("Climbed!");
+        holdState = HoldState.CLIMBED;
+    }
+
     void beginIntakingCage() {
         Logger.info("Intaking cage.");
         holdState = HoldState.INTAKING_CAGE;
@@ -160,7 +170,6 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         rollerMotor.close();
         leftPivotMotor.close();
         rightPivotMotor.close();
-        solenoid.close();
         limitSwitch.close();
     }
 
@@ -171,7 +180,7 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
 
         final Angle theta;
 
-        private PivotState(Angle theta) {this.theta = theta;}
+        PivotState(Angle theta) {this.theta = theta;}
     }
 
     enum HoldState {
