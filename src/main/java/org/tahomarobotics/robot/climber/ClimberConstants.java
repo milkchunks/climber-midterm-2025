@@ -13,7 +13,7 @@ class ClimberConstants {
     private static final double ROLLER_GEAR_RATIO = (34.0 / 8.0) * (18.0 / 18.0);
     private static final double PIVOT_GEAR_RATIO = (72.0 / 8.0) * (72.0 / 20.0) * (9.0 / 72.0) * (36.0 / 9.0);
 
-    private static final AngularVelocity MAX_ROLLER_VELOCITY = RotationsPerSecond.of(5.0);
+    static final AngularVelocity MAX_ROLLER_VELOCITY = RotationsPerSecond.of(5.0);
     //wow this is the worst thing ever
     //reach max velocity in 1/4 of a second at the fastest (tentative)
     private static final AngularAcceleration MAX_ROLLER_ACCELERATION = RotationsPerSecondPerSecond.of(MAX_ROLLER_VELOCITY.times(RotationsPerSecond.of(4.0)).magnitude());
@@ -37,7 +37,7 @@ class ClimberConstants {
                     .withBeepOnBoot(true)
                     .withBeepOnConfig(true))
             .withFeedback(new FeedbackConfigs()
-                    .withSensorToMechanismRatio(ROLLER_GEAR_RATIO))
+                    .withSensorToMechanismRatio(ROLLER_GEAR_RATIO * 360.0))
             .withHardwareLimitSwitch(new HardwareLimitSwitchConfigs()
                     .withForwardLimitRemoteSensorID(RobotMap.CLIMBER_LIMIT_SWITCH))
             .withMotionMagic(new MotionMagicConfigs()
@@ -53,7 +53,7 @@ class ClimberConstants {
                     .withBeepOnBoot(true)
                     .withBeepOnConfig(true))
             .withFeedback(new FeedbackConfigs()
-                    .withSensorToMechanismRatio(PIVOT_GEAR_RATIO))
+                    .withSensorToMechanismRatio(PIVOT_GEAR_RATIO * 360.0))
             .withMotionMagic(new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(MAX_PIVOT_VELOCITY)
                     .withMotionMagicAcceleration(MAX_PIVOT_ACCELERATION));
@@ -66,7 +66,7 @@ class ClimberConstants {
                     .withBeepOnBoot(true)
                     .withBeepOnConfig(true))
             .withFeedback(new FeedbackConfigs()
-                    .withSensorToMechanismRatio(PIVOT_GEAR_RATIO))
+                    .withSensorToMechanismRatio(PIVOT_GEAR_RATIO * 360.0))
             .withMotionMagic(new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(MAX_PIVOT_VELOCITY)
                     .withMotionMagicAcceleration(MAX_PIVOT_ACCELERATION));

@@ -1,5 +1,6 @@
 package org.tahomarobotics.robot.climber;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.tinylog.Logger;
 
 public class Climber implements AutoCloseable {

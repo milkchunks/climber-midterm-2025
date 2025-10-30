@@ -3,19 +3,18 @@ package org.tahomarobotics.robot.climber;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.sim.DeviceType;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.tahomarobotics.robot.RobotMap;
 import org.tahomarobotics.robot.util.AbstractSubsystem;
 import org.tahomarobotics.robot.util.RobustConfigurator;
 import org.tahomarobotics.robot.util.signals.LoggedStatusSignal;
 import org.tinylog.Logger;
+
+import static edu.wpi.first.units.BaseUnits.AngleUnit;
 
 class ClimberSubsystem extends AbstractSubsystem {
     final TalonFX rollerMotor;
@@ -46,7 +45,6 @@ class ClimberSubsystem extends AbstractSubsystem {
                 new LoggedStatusSignal("Roller Velocity", rollerMotor.getVelocity()),
                 new LoggedStatusSignal("Pivot Voltage", leftPivotMotor.getMotorVoltage())
         };
-
 
         RobustConfigurator.tryConfigureTalonFX("Climber Roller Motor", rollerMotor, ClimberConstants.climberMotorConfiguration);
         RobustConfigurator.tryConfigureTalonFX("Climber Left Pivot Motor", leftPivotMotor, ClimberConstants.leftMotorConfiguration);
@@ -93,6 +91,30 @@ class ClimberSubsystem extends AbstractSubsystem {
         solenoid.set(false);
     }
 
+    void transitionToStowed() {
+        disengageSolenoid();
+        pivotState = PivotState.STOWED;
+        setPivotPosition(PivotState.STOWED.theta);
+        engageSolenoid();
+    }
+
+    void transitionToDeployed() {
+        disengageSolenoid();
+        pivotState = PivotState.DEPLOYED;
+        setPivotPosition(PivotState.DEPLOYED.theta);
+        engageSolenoid();
+    }
+
+    void transitionToHoldingCage() {
+        holdState = HoldState.HOLDING_CAGE;
+        stopRoller();
+    }
+
+    void transitionToIntakingCage() {
+        holdState = HoldState.INTAKING_CAGE;
+        setRollerVelocity(ClimberConstants.MAX_ROLLER_VELOCITY);
+    }
+
     @Override
     public void subsystemPeriodic() {
         LoggedStatusSignal.refreshAll(signals);
@@ -100,21 +122,19 @@ class ClimberSubsystem extends AbstractSubsystem {
     }
 
     enum PivotState {
-        STOWED(ClimberConstants.STOW_POSITION),
-        DEPLOYED(ClimberConstants.DEPLOY_POSITION),
-        ZEROED(ClimberConstants.STOW_POSITION);
+        STOWED(Angle.ofBaseUnits(ClimberConstants.STOW_POSITION, Units.Degrees)),
+        DEPLOYED(Angle.ofBaseUnits(ClimberConstants.STOW_POSITION, Units.Degrees)),
+        ZEROED(Angle.ofBaseUnits(ClimberConstants.STOW_POSITION, Units.Degrees));
 
-        final double position;
+        final Angle theta;
 
-        private PivotState(double position) {
-            this.position = position;
-        }
+        private PivotState(Angle theta) {this.theta = theta;}
     }
 
     enum HoldState {
         EMPTY,
         HOLDING_CAGE,
         INTAKING_CAGE,
-        EJECTING_CAGE;
+        CLIMBED;
     }
 }
