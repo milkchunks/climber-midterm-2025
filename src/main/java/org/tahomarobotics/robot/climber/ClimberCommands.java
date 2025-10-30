@@ -12,7 +12,7 @@ public class ClimberCommands {
         return climberSubsystem
                 .runOnce(climberSubsystem::disengageSolenoid)
                 .andThen(climberSubsystem.runOnce(climberSubsystem::setZeroingVoltage))
-                .andThen(Commands.waitUntil(climberSubsystem::pivotIsStopped)/*.withTimeout(ClimberConstants.ZEROING_TIMEOUT)*/)
+                .andThen(Commands.waitUntil(climberSubsystem::pivotIsStopped).withTimeout(ClimberConstants.ZEROING_TIMEOUT))
                 .andThen(climberSubsystem::zero);
     }
 
