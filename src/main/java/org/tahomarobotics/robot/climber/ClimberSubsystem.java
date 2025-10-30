@@ -2,8 +2,10 @@ package org.tahomarobotics.robot.climber;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -67,6 +69,10 @@ class ClimberSubsystem extends AbstractSubsystem implements AutoCloseable {
         RobustConfigurator.tryConfigureTalonFX("Climber Roller Motor", rollerMotor, ClimberConstants.climberMotorConfiguration);
         RobustConfigurator.tryConfigureTalonFX("Climber Left Pivot Motor", leftPivotMotor, ClimberConstants.leftMotorConfiguration);
         RobustConfigurator.tryConfigureTalonFX("Climber Right Pivot Motor", rightPivotMotor, ClimberConstants.rightMotorConfiguration);
+
+        BaseStatusSignal.setUpdateFrequencyForAll(50, signals[0].signal(), signals[1].signal()); //more important
+        BaseStatusSignal.setUpdateFrequencyForAll(10, signals[2].signal()); //less important
+        ParentDevice.optimizeBusUtilizationForAll(rollerMotor, leftPivotMotor, rightPivotMotor);
     }
 
     void setRollerVelocity(AngularVelocity targetVelocity) {

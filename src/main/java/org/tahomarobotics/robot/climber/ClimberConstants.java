@@ -28,6 +28,7 @@ class ClimberConstants {
     static final double ZERO_VOLTAGE = 1.0;
     static final double STOPPED_TOLERANCE = 0.01;
     static final int ZEROING_TIMEOUT = 5;
+    static final int CLIMB_TIMEOUT = 10;
 
     static final TalonFXConfiguration climberMotorConfiguration = new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs()
