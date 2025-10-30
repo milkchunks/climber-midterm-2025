@@ -21,12 +21,13 @@ class ClimberConstants {
     private static final AngularVelocity MAX_PIVOT_VELOCITY = RotationsPerSecond.of(2.0);
     private static final AngularAcceleration MAX_PIVOT_ACCELERATION = RotationsPerSecondPerSecond.of(MAX_PIVOT_VELOCITY.times(RotationsPerSecond.of(4.0)).magnitude());
 
-    static final double STOW_POSITION = 0.0;
+    static final double STOW_POSITION = 10.0;
     static final double DEPLOY_POSITION = 90.0;
+    static final double ZERO_POSITION = 0.0;
 
     static final double ZERO_VOLTAGE = 1.0;
-
-    static final double SOLENOID_ENGAGEMENT_PERCENT_SPEED = 1.0;
+    static final double STOPPED_TOLERANCE = 0.01;
+    static final int ZEROING_TIMEOUT = 5;
 
     static final TalonFXConfiguration climberMotorConfiguration = new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs()

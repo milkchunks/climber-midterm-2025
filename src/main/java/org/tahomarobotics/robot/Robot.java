@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.tahomarobotics.robot.climber.Climber;
 import org.tahomarobotics.robot.util.AbstractSubsystem;
 
@@ -29,6 +32,7 @@ public class Robot extends LoggedRobot
     {
         oi = new OI();
         AutoLogOutputManager.addObject(climber);
+        Logger.recordMetadata("Allison Bowe Midterm 2025", "ClimberBot");
         Logger.start();
     }
     
@@ -83,7 +87,8 @@ public class Robot extends LoggedRobot
     
     
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+    }
     
     
     @Override
