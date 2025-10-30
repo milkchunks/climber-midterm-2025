@@ -24,6 +24,8 @@ class ClimberConstants {
     static final double STOW_POSITION = 0.0;
     static final double DEPLOY_POSITION = 90.0;
 
+    static final double ZERO_VOLTAGE = 1.0;
+
     static final TalonFXConfiguration climberMotorConfiguration = new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs()
                     .withNeutralMode(NeutralModeValue.Brake)
